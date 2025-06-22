@@ -1,15 +1,16 @@
 /*******************************************************************************
+  Company:
+    Microchip Technology Inc.
+
   File Name:
-    nm_common.h
+    netinet_in.h
 
   Summary:
-    This module contains WINC1500 BSP APIs declarations.
 
   Description:
-    This module contains WINC1500 BSP APIs declarations.
  *******************************************************************************/
 
-//DOM-IGNORE-BEGIN
+// DOM-IGNORE-BEGIN
 /*
 Copyright (C) 2022, Microchip Technology Inc., and its subsidiaries. All rights reserved.
 
@@ -32,57 +33,62 @@ source software license terms, no license or other rights, whether express or
 implied, are granted under any patent or other intellectual property rights of
 Microchip or any third party.
 */
-//DOM-IGNORE-END
+// DOM-IGNORE-END
 
-/** @defgroup nm_bsp BSP
-    @brief
-        Description of the BSP (<strong>B</strong>oard <strong>S</strong>upport <strong>P</strong>ackage) module.
-    @{
-        @defgroup   DataT       Data Types
-        @defgroup   BSPDefine   Defines
-        @defgroup   BSPAPI      Functions
-        @brief
-            Lists the available BSP (<strong>B</strong>oard <strong>S</strong>upport <strong>P</strong>ackage) APIs.
-    @}
- */
+#ifndef _NETINET_IN_H
+#define _NETINET_IN_H
 
-/**@addtogroup BSPDefine
-   @{
- */
-#ifndef _NM_BSP_H_
-#define _NM_BSP_H_
+#include <stdint.h>
 
-
-#define BSP_MIN(x,y) ((x)>(y)?(y):(x))
-/*!<
-*     Computes the minimum value between \b x and \b y.
-*/
-/**@}*/     //BSPDefine
-
- //@}
-
-/**
- * @addtogroup BSPDefine
- * @{
- */
-#ifdef _NM_BSP_BIG_END
-/*! Switch endianness of 32bit word (In the case that Host is BE) */
-#define NM_BSP_B_L_32(x)      \
-((((x) & 0x000000FF) << 24) + \
-(((x) & 0x0000FF00) << 8)   + \
-(((x) & 0x00FF0000) >> 8)   + \
-(((x) & 0xFF000000) >> 24))
-
-/*! Switch endianness of 16bit word (In the case that Host is BE) */
-#define NM_BSP_B_L_16(x) \
-((((x) & 0x00FF) << 8) + \
-(((x)  & 0xFF00) >> 8))
-#else
-/*! Retain endianness of 32bit word (In the case that Host is LE) */
-#define NM_BSP_B_L_32(x)  (x)
-/*! Retain endianness of 16bit word (In the case that Host is LE) */
-#define NM_BSP_B_L_16(x)  (x)
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus // Provide C++ Compatibility
+    extern "C" {
 #endif
-/**@}*/     //BSPDefine
+// DOM-IGNORE-END
 
-#endif  /*_NM_BSP_H_*/
+typedef uint32_t in_addr_t;
+
+struct in_addr {
+    /*!<
+        Network Byte Order representation of the IPv4 address. For example,
+        the address "192.168.0.10" is represented as 0x0A00A8C0.
+    */
+    in_addr_t s_addr;
+};
+
+struct sockaddr_in{
+    uint16_t        sin_family;
+    /*!<
+        Specifies the address family(AF).
+        Members of AF_INET address family are IPv4 addresses.
+        Hence,the only supported value for this is AF_INET.
+    */
+    uint16_t        sin_port;
+    /*!<
+        Port number of the socket.
+        Network sockets are identified by a pair of IP addresses and port number.
+        Must be set in the Network Byte Order format , @ref _htons (e.g. _htons(80)).
+        Can NOT have zero value.
+    */
+    struct in_addr  sin_addr;
+    /*!<
+        IP Address of the socket.
+        The IP address is of type @ref in_addr structure.
+        Can be set to "0" to accept any IP address for server operation.
+    */
+    uint8_t         sin_zero[8];
+    /*!<
+        Padding to make structure the same size as @ref sockaddr.
+    */
+};
+
+const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+in_addr_t inet_addr(const char *cp);
+
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus
+}
+#endif
+// DOM-IGNORE-END
+
+#endif /* _NETINET_IN_H */
